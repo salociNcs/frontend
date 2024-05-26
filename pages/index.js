@@ -1,10 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 export default function Home() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const login = async () => {
     const res = await fetch('/api/login', {
@@ -20,7 +27,7 @@ export default function Home() {
       localStorage.setItem('token', data.token);
       router.push('/dashboard');
     } else {
-      alert('Login fehlgeschlagen');
+      alert(data.msg || 'Login fehlgeschlagen');
     }
   };
 
