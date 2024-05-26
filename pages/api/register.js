@@ -1,12 +1,12 @@
 export default async function handler(req, res) {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     const response = await fetch('http://localhost:4000/api/auth/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, email, password }),
     });
 
     const data = await response.json();
