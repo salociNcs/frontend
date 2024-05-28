@@ -1,47 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 export default function Home() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      router.push('/dashboard');
+      fetchUser(token);
     }
   }, [router]);
 
-  const login = async () => {
-    const res = await fetch('/api/login', {
-      method: 'POST',
+  const fetchUser = async (token) => {
+    const res = await fetch('/api/auth/user', {
       headers: {
-        'Content-Type': 'application/json',
+        'x-auth-token': token,
       },
-      body: JSON.stringify({ email, password }),
     });
 
-    const data = await res.json();
     if (res.ok) {
-      localStorage.setItem('token', data.token);
-      router.push('/dashboard');
+      const user = await res.json();
+      if (user.isVerified) {
+        router.push('/dashboard');
+      } else {
+        router.push('/verify-email');
+      }
     } else {
-      alert(data.msg || 'Login fehlgeschlagen');
+      localStorage.removeItem('token');
+      router.push('/'); // Redirect to home page if token is invalid
     }
-  };
-
-  const register = () => {
-    router.push('/register');
   };
 
   return (
     <div>
       <h1>Willkommen</h1>
-      <input type="email" placeholder="E-Mail" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Passwort" value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button onClick={login}>Anmelden</button>
-      <button onClick={register}>Registrieren</button>
+      <button onClick={() => router.push('/login')}>Anmelden</button>
+      <button onClick={() => router.push('/register')}>Registrieren</button>
     </div>
   );
 }
