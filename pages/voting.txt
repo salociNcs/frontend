@@ -1,0 +1,94 @@
+import { useState, useEffect } from 'react';
+
+const userId = "665e2697be5ce2fa3cbfdc65";
+const poolId = "665e1d5ccc21bafeb9710fe5";
+
+const Voting = () => {
+    const [watchData, setWatchData] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const getWatchDataForVoting = async () => {
+        const res = await fetch('api/watchDataForVoting', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, poolId }),
+        });
+
+        const watchDataRes = await res.json();
+        console.log(watchDataRes);
+        setWatchData(watchDataRes);
+
+    };
+
+    const updateVote = async (voteId, liked) => {
+        const res = await fetch('api/watchDataVote', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, poolId, voteId, liked }),
+        });
+
+        const updatedRes = await res.json();
+        console.log(updatedRes);
+
+    };
+
+    useEffect(() => {
+        getWatchDataForVoting();
+    }, []);
+
+
+    const handleLike = async () => {
+        // Hier kannst du den Befehl ans Backend senden
+        console.log('Like:', watchData[currentIndex]);
+        await updateVote(watchData[currentIndex].voteId, true);
+        showNextEntry();
+    };
+
+    const handleNoLike = async () => {
+        // Hier kannst du den Befehl ans Backend senden
+        console.log('No Like:', watchData[currentIndex]);
+        await updateVote(watchData[currentIndex].voteId, false);
+        showNextEntry();
+    };
+
+    const showNextEntry = () => {
+        if (currentIndex < watchData.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+        } else {
+            setWatchData([]);
+        }
+    };
+
+    if (watchData.length === 0) {
+        return <div>Keine Einträge mehr vorhanden</div>;
+    }
+
+    const currentEntry = watchData[currentIndex];
+
+    return (
+        <div style={{ textAlign: 'center' }}>
+            <div>
+                <h1>Voting Data</h1>
+                {watchData ? (
+                    <div>
+                        <h1>{currentEntry.title}</h1>
+                        <img src={currentEntry.image} alt={currentEntry.title} style={{ width: '300px', height: 'auto' }} />
+                        <div>
+                            <button onClick={handleLike}>Like</button>
+                            <button onClick={handleNoLike}>No Like</button>
+                        </div>
+                    </div>
+                ) : (
+                    <p>Loading...</p>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default Voting;
+

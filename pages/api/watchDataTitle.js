@@ -1,11 +1,16 @@
 export default async function handler(req, res) {
-    const { verificationCode } = req.body;
-    const response = await fetch('http://localhost:4000/api/auth/verify-email', {
+    if (req.method !== 'POST') {
+        res.status(405).json({ msg: 'Method not allowed' });
+        return;
+    }
+
+    const { watchDataId } = req.body;
+    const response = await fetch('http://localhost:4000/api/watchFinder/title', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ verificationCode }),
+        body: JSON.stringify({ watchDataId }),
     });
 
     const data = await response.json();

@@ -18,7 +18,7 @@ export default function Register() {
 
         const data = await res.json();
         if (res.ok) {
-            localStorage.setItem('token', data.token);
+            // localStorage.setItem('token', data.token);
             router.push('/verify-email');
         } else {
             alert(data.msg || 'Registrierung fehlgeschlagen');

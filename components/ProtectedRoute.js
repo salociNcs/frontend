@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useUser } from '../context/UserContext';
 
 const ProtectedRoute = ({ children }) => {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
+
+    const { user, setUser } = useUser();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -24,6 +27,7 @@ const ProtectedRoute = ({ children }) => {
                 if (!user.isVerified) {
                     router.push('/verify-email');
                 } else {
+                    setUser(user);
                     setLoading(false);
                 }
             } else {
